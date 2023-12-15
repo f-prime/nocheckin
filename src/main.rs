@@ -1,10 +1,15 @@
-use std::{env, process::exit, fs::{self, read_dir, DirEntry}, sync::mpsc};
 use std::thread;
+use std::{
+    env,
+    fs::{self, read_dir, DirEntry},
+    process::exit,
+    sync::mpsc,
+};
 
 fn does_file_contain_nocheckin(file: &str, nocheckin_str: &str) -> bool {
     let file_contents = fs::read_to_string(file);
     if let Ok(x) = file_contents {
-        return x.contains(&nocheckin_str)
+        return x.contains(&nocheckin_str);
     }
 
     false
@@ -12,9 +17,9 @@ fn does_file_contain_nocheckin(file: &str, nocheckin_str: &str) -> bool {
 
 fn apply_filter(f: &DirEntry) -> bool {
     f.file_name()
-    .to_str()
-    .map(|x| x.starts_with("."))
-    .unwrap_or(false)
+        .to_str()
+        .map(|x| x.starts_with("."))
+        .unwrap_or(false)
 }
 
 fn walk_dir(path: &str) -> (Vec<String>, bool) {
@@ -38,11 +43,11 @@ fn walk_dir(path: &str) -> (Vec<String>, bool) {
                     if x.path().is_dir() {
                         s.spawn(move || {
                             let (r, ncf) = walk_dir(&fp.to_str().unwrap());
-                        
+
                             ctx.send(ncf).unwrap();
-                        
+
                             for nc in r {
-                                println!("{} contains no checkin", nc); 
+                                println!("{} contains no checkin", nc);
                             }
                         });
                     } else if does_file_contain_nocheckin(&fp.to_str().unwrap(), "NOCHECKIN") {
@@ -58,7 +63,7 @@ fn walk_dir(path: &str) -> (Vec<String>, bool) {
 
     for r in rx {
         if r {
-            return (contains_nocheckin, true)
+            return (contains_nocheckin, true);
         }
     }
 
@@ -80,5 +85,4 @@ fn main() {
         println!("Usage: ./nocheckin <root>");
         exit(1)
     }
-
 }
