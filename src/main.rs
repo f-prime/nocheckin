@@ -42,17 +42,13 @@ fn walk_dir(path: &str) -> (Vec<String>, bool) {
 
                     if x.path().is_dir() {
                         s.spawn(move || {
-                            let (r, ncf) = walk_dir(&fp.to_str().unwrap());
-
+                            let (_, ncf) = walk_dir(&fp.to_str().unwrap());
                             ctx.send(ncf).unwrap();
-
-                            for nc in r {
-                                println!("{} contains no checkin", nc);
-                            }
                         });
                     } else if does_file_contain_nocheckin(&fp.to_str().unwrap(), "NOCHECKIN") {
                         contains_nocheckin.push(String::from(fp.to_str().unwrap()));
                         ctx.send(true).unwrap();
+                        println!("{} contains no checkin", fp.to_str().unwrap());
                     }
                 }
             }
